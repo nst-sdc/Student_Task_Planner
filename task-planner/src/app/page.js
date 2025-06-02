@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { PlusIcon, TrashIcon, PencilIcon, CheckIcon } from '@heroicons/react/24/outline';
-import { format } from 'date-fns';
+import { format, isValid } from 'date-fns';
 import toast from 'react-hot-toast';
 import useTaskStore from '../store/taskStore';
+import Link from 'next/link';
 
 const categories = ['Homework', 'Project', 'Exam Prep', 'Other'];
 const priorities = ['High', 'Medium', 'Low'];
@@ -27,7 +28,19 @@ export default function Home() {
       toast.error('Please fill in all required fields');
       return;
     }
-    addTask(newTask);
+
+    // Ensure deadline is a valid date
+    const deadlineDate = new Date(newTask.deadline);
+    if (!isValid(deadlineDate)) {
+      toast.error('Please enter a valid deadline');
+      return;
+    }
+
+    addTask({
+      ...newTask,
+      deadline: deadlineDate.toISOString(),
+    });
+
     setNewTask({
       title: '',
       description: '',
@@ -52,10 +65,30 @@ export default function Home() {
     }
   };
 
+  const formatDate = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      if (!isValid(date)) {
+        return 'Invalid date';
+      }
+      return format(date, 'MMM d, yyyy h:mm a');
+    } catch (error) {
+      return 'Invalid date';
+    }
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Student Task Planner</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900">Student Task Planner</h1>
+          <Link
+            href="/bin"
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            View Bin
+          </Link>
+        </div>
         
         {!isAddingTask ? (
           <button
@@ -180,7 +213,7 @@ export default function Home() {
                 </span>
               </div>
               <p className="text-sm text-gray-500">
-                Due: {format(new Date(task.deadline), 'MMM d, yyyy h:mm a')}
+                Due: {formatDate(task.deadline)}
               </p>
             </div>
           ))}
