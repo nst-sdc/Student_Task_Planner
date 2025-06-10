@@ -7,6 +7,7 @@ export default function AddTaskModal({ open, onClose, onAdd }) {
     title: '',
     subject: '',
     date: '',
+    time: '',
     description: '',
     priority: 'Normal',
   });
@@ -20,7 +21,7 @@ export default function AddTaskModal({ open, onClose, onAdd }) {
   function handleSubmit(e) {
     e.preventDefault();
     onAdd(form);
-    setForm({ title: '', subject: '', date: '', description: '', priority: 'Normal' });
+    setForm({ title: '', subject: '', date: '', time: '', description: '', priority: 'Normal' });
     onClose();
   }
 
@@ -32,7 +33,10 @@ export default function AddTaskModal({ open, onClose, onAdd }) {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input name="title" value={form.title} onChange={handleChange} required placeholder="Title" className="border rounded px-3 py-2" />
           <input name="subject" value={form.subject} onChange={handleChange} required placeholder="Subject" className="border rounded px-3 py-2" />
-          <input name="date" value={form.date} onChange={handleChange} required type="date" className="border rounded px-3 py-2" />
+          <div className="flex gap-2">
+            <input name="date" value={form.date} onChange={handleChange} required type="date" className="border rounded px-3 py-2 w-1/2" />
+            <input name="time" value={form.time} onChange={handleChange} required type="time" className="border rounded px-3 py-2 w-1/2" />
+          </div>
           <textarea name="description" value={form.description} onChange={handleChange} required placeholder="Description" className="border rounded px-3 py-2" />
           <div className="flex gap-2">
             {PRIORITIES.map((p) => (

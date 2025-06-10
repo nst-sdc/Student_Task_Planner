@@ -15,9 +15,9 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-center">Sign Up</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-2">
+      <div className="bg-white p-4 sm:p-8 rounded-xl shadow-md w-full max-w-md">
+        <h1 className="text-xl sm:text-2xl font-bold mb-6 text-center">Sign Up</h1>
         {submitted ? (
           <div className="text-green-600 text-center">Signup successful! (Backend coming soon)</div>
         ) : (
