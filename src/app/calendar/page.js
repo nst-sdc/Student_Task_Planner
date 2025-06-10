@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { addDays, startOfMonth, endOfMonth, startOfWeek, endOfWeek, format, isSameDay, isSameMonth, isToday, addMonths, subMonths } from 'date-fns';
 import { enIN } from 'date-fns/locale';
 import AddTaskModal from '@/components/AddTaskModal';
+import useTaskStore from '@/store/taskStore';
 
 function getISTDate(date) {
   // Convert to IST (UTC+5:30)
@@ -30,12 +31,6 @@ function getMonthMatrix(year, month) {
 export default function CalendarPage() {
   const [view, setView] = useState('month');
   const [modalOpen, setModalOpen] = useState(false);
-  const [events, setEvents] = useState([
-    { date: '2024-12-08', label: 'Team Meeting', color: 'bg-blue-100 text-blue-700' },
-    { date: '2024-12-12', label: 'Project Review', color: 'bg-green-100 text-green-700' },
-    { date: '2024-12-18', label: 'Today', color: 'bg-blue-500 text-white' },
-    { date: '2024-12-20', label: 'Client Call', color: 'bg-purple-100 text-purple-700' },
-  ]);
   const todayIST = getISTDate(new Date());
   const [currentDate, setCurrentDate] = useState(todayIST);
   const year = currentDate.getFullYear();
@@ -43,15 +38,11 @@ export default function CalendarPage() {
   const monthMatrix = getMonthMatrix(year, month);
   const monthName = format(currentDate, 'LLLL yyyy', { locale: enIN });
 
+  // Use global tasks from Zustand
+  const { tasks, addTask } = useTaskStore();
+
   function handleAddTask(task) {
-    setEvents((prev) => [
-      ...prev,
-      {
-        date: task.date,
-        label: task.title,
-        color: task.priority === 'High' ? 'bg-red-100 text-red-700' : task.priority === 'Normal' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700',
-      },
-    ]);
+    addTask(task);
   }
 
   return (
@@ -119,7 +110,7 @@ export default function CalendarPage() {
                       {week.map((date, j) => {
                         const isCurrentMonth = isSameMonth(date, currentDate);
                         const isCurrentDay = isToday(date);
-                        const dayEvents = events.filter(e => e.date === format(date, 'yyyy-MM-dd'));
+                        const dayTasks = tasks.filter(e => e.date === format(date, 'yyyy-MM-dd'));
                         return (
                           <td
                             key={j}
@@ -127,10 +118,10 @@ export default function CalendarPage() {
                           >
                             <div className={`absolute top-2 left-2 text-xs font-semibold ${isCurrentDay ? 'text-blue-600' : 'text-gray-700'}`}>{format(date, 'd')}</div>
                             <div className="absolute bottom-2 left-2 right-2 flex flex-col gap-1">
-                              {dayEvents.map((event, idx) => (
-                                <div key={idx} className={`px-2 py-1 rounded text-xs font-semibold truncate ${event.color}`}>
+                              {dayTasks.map((event, idx) => (
+                                <div key={idx} className={`px-2 py-1 rounded text-xs font-semibold truncate ${event.priority === 'High' ? 'bg-red-100 text-red-700' : event.priority === 'Normal' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}`}>
                                   {event.time ? <span className="font-normal text-gray-700 mr-1">{event.time}</span> : null}
-                                  {event.label}
+                                  {event.title}
                                 </div>
                               ))}
                             </div>

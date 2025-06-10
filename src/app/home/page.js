@@ -6,6 +6,7 @@ import TaskFilters from '@/components/TaskFilters';
 import AddTaskModal from '@/components/AddTaskModal';
 import ProgressBar from '@/components/ProgressBar';
 import CalendarBar from '@/components/CalendarBar';
+import { format } from 'date-fns';
 
 const mockUser = {
   name: 'user',
@@ -70,17 +71,24 @@ const calendarDays = [
   { day: 'Sun', date: 1 },
 ];
 
+function getISTToday() {
+  const now = new Date();
+  const ist = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
+  return format(ist, 'yyyy-MM-dd');
+}
+
 function filterTasks(tasks, filter) {
-  const today = new Date();
+  const today = getISTToday();
+  let filtered = tasks.filter((t) => t.date === today);
   switch (filter) {
     case 'Pending':
-      return tasks.filter((t) => !t.completed && !t.overdue);
+      return filtered.filter((t) => !t.completed && !t.overdue);
     case 'Completed':
-      return tasks.filter((t) => t.completed);
+      return filtered.filter((t) => t.completed);
     case 'Overdue':
-      return tasks.filter((t) => t.overdue);
+      return filtered.filter((t) => t.overdue);
     default:
-      return tasks;
+      return filtered;
   }
 }
 
@@ -89,13 +97,15 @@ export default function Home() {
   const [filter, setFilter] = useState('All');
   const [showAdd, setShowAdd] = useState(false);
   const filteredTasks = filterTasks(tasks, filter);
-  const completedCount = tasks.filter((t) => t.completed).length;
+  const completedCount = filteredTasks.filter((t) => t.completed).length;
 
   // Mark overdue tasks (for demo, mark if date < today)
   tasks.forEach((task) => {
     if (task.date && !task.completed) {
       const due = new Date(task.date);
-      task.overdue = due < new Date(new Date().toDateString());
+      const now = new Date();
+      const ist = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
+      task.overdue = due < new Date(format(ist, 'yyyy-MM-dd'));
     } else {
       task.overdue = false;
     }
@@ -124,7 +134,7 @@ export default function Home() {
         </div>
         {/* Progress Bar */}
         <div className="px-2 sm:px-4 md:px-8 pt-3 sm:pt-4 w-full min-w-0">
-          <ProgressBar completed={completedCount} total={tasks.length} />
+          <ProgressBar completed={completedCount} total={filteredTasks.length} />
         </div>
         {/* Task List */}
         <section className="flex-1 px-1 sm:px-2 md:px-8 py-4 sm:py-6 bg-gray-50 w-full min-w-0">
