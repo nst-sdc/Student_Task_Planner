@@ -38,7 +38,9 @@ export default function Sidebar() {
       >
         <div>
           <div className="flex items-center gap-2 px-6 py-6">
-            <span className="text-indigo-700 text-2xl font-bold">TaskPlanner</span>
+            <span className="text-indigo-700 text-2xl font-bold">
+              <a href="/" className="no-underline hover:underline">TaskPlanner</a>
+            </span>
             {/* Close button (always visible when sidebar is open) */}
             {open && (
               <button

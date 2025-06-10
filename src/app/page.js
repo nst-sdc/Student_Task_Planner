@@ -9,10 +9,10 @@ function NavbarHero() {
         <span className="font-bold text-xl text-indigo-700">TaskPlanner</span>
       </div>
       <div className="flex gap-4 sm:gap-8 text-gray-500 font-medium text-base sm:text-lg">
-        <a href="#" className="hover:text-indigo-600">Dashboard</a>
+        <a href="/home" className="hover:text-indigo-600">Dashboard</a>
         <a href="#" className="text-indigo-600 font-semibold">Courses</a>
         <a href="#" className="hover:text-indigo-600">Analytics</a>
-        <a href="#" className="hover:text-indigo-600">Settings</a>
+        <a href="/settings" className="hover:text-indigo-600">Settings</a>
       </div>
       <div className="flex items-center gap-4">
         <span className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
@@ -112,25 +112,11 @@ export default function LandingPage() {
     <div className="bg-gray-50 min-h-screen flex flex-col w-full overflow-x-hidden">
       <NavbarHero />
       <HeroSection />
-      {/* Search and filter bar */}
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-4 items-center justify-between py-4 sm:py-6 px-2 sm:px-4 w-full min-w-0">
-        <div className="flex gap-2 w-full md:w-auto min-w-0">
-          <input className="border rounded px-4 py-2 w-32 sm:w-40" placeholder="" disabled />
-          <input className="border rounded px-4 py-2 w-32 sm:w-40" placeholder="" disabled />
-        </div>
-        <input
-          className="border rounded px-4 py-2 w-full md:w-80"
-          placeholder="Search courses..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
-      </div>
       <CourseGrid title="Featured Courses" count={3} />
       <CourseGrid title="All Courses" count={4} />
       <div className="flex justify-center my-4 sm:my-6 w-full min-w-0">
         <button className="bg-indigo-500 text-white px-6 py-2 rounded font-semibold hover:bg-indigo-600">Load More Courses</button>
       </div>
-      {/* Remove margin between promo and footer */}
       <div className="m-0 p-0 w-full min-w-0">
         <PromoSection />
         <FooterHero />

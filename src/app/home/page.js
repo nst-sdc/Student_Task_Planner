@@ -6,11 +6,11 @@ import TaskFilters from '@/components/TaskFilters';
 import AddTaskModal from '@/components/AddTaskModal';
 import ProgressBar from '@/components/ProgressBar';
 import CalendarBar from '@/components/CalendarBar';
-import { format } from 'date-fns';
+import { format, startOfWeek, addDays, isToday } from 'date-fns';
 
 const mockUser = {
   name: 'user',
-  avatar: 'https://ui-avatars.com/api/?name=Nihal&background=4f46e5&color=fff',
+  avatar: 'https://ui-avatars.com/api/?name=U&background=4f46e5&color=fff',
 };
 
 const mockTasks = [
@@ -61,15 +61,31 @@ const mockTasks = [
   },
 ];
 
-const calendarDays = [
-  { day: 'Mon', date: 26 },
-  { day: 'Tue', date: 27 },
-  { day: 'Wed', date: 28, current: true },
-  { day: 'Thu', date: 29 },
-  { day: 'Fri', date: 30 },
-  { day: 'Sat', date: 31 },
-  { day: 'Sun', date: 1 },
-];
+function getISTTodayDate() {
+  const now = new Date();
+  return new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
+}
+
+function getISTWeek() {
+  const todayIST = getISTTodayDate();
+  const weekStart = startOfWeek(todayIST, { weekStartsOn: 1 }); // Monday
+  return Array.from({ length: 7 }).map((_, i) => {
+    const d = addDays(weekStart, i);
+    return {
+      day: format(d, 'EEE'),
+      date: d.getDate(),
+      current: isToday(d),
+    };
+  });
+}
+
+function getISTWeekRangeLabel() {
+  const week = getISTWeek();
+  const todayIST = getISTTodayDate();
+  const month1 = format(addDays(todayIST, -todayIST.getDay() + 1), 'MMM d');
+  const month2 = format(addDays(todayIST, 7 - todayIST.getDay()), 'MMM d');
+  return `${month1} - ${month2}`;
+}
 
 function getISTToday() {
   const now = new Date();
@@ -147,7 +163,7 @@ export default function Home() {
         </section>
         {/* Calendar Bar */}
         <footer className="bg-white border-t px-1 sm:px-4 md:px-8 py-3 sm:py-4 w-full min-w-0">
-          <CalendarBar days={calendarDays} rangeLabel="May 26 - Jun 1" />
+          <CalendarBar days={getISTWeek()} rangeLabel={getISTWeekRangeLabel()} />
         </footer>
         <AddTaskModal
           open={showAdd}
