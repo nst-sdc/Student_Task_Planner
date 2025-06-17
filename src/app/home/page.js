@@ -7,11 +7,7 @@ import AddTaskModal from '@/components/AddTaskModal';
 import ProgressBar from '@/components/ProgressBar';
 import CalendarBar from '@/components/CalendarBar';
 import { format, startOfWeek, addDays, isToday } from 'date-fns';
-
-const mockUser = {
-  name: 'user',
-  avatar: 'https://ui-avatars.com/api/?name=U&background=4f46e5&color=fff',
-};
+import { useAuthStore } from '@/store/authStore';
 
 const mockTasks = [
   {
@@ -115,6 +111,8 @@ export default function Home() {
   const filteredTasks = filterTasks(tasks, filter);
   const completedCount = filteredTasks.filter((t) => t.completed).length;
 
+  const user = useAuthStore((state) => state.user);
+
   // Mark overdue tasks (for demo, mark if date < today)
   tasks.forEach((task) => {
     if (task.date && !task.completed) {
@@ -127,20 +125,23 @@ export default function Home() {
     }
   });
 
+  const userName = user?.profile?.full_name || 'User';
+  const userAvatar = user?.profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=4f46e5&color=fff`;
+
   return (
     <div className="bg-gray-100 min-h-screen flex w-full overflow-x-hidden">
       <main className="flex-1 flex flex-col min-h-screen w-full min-w-0">
         {/* Header */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 px-2 sm:px-4 md:px-8 py-4 sm:py-6 border-b bg-white w-full min-w-0">
           <div className="w-full min-w-0">
-            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-1">Welcome back, {mockUser.name}</h1>
-            <div className="text-gray-500 text-sm">Here's what's on your plate today.</div>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-1">Welcome back, {userName}</h1>
+            <div className="text-gray-500 text-sm">Here&apos;s what&apos;s on your plate today.</div>
           </div>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full sm:w-auto min-w-0">
             <button className="bg-indigo-600 text-white px-3 py-2 rounded-lg font-semibold shadow hover:bg-indigo-700 w-full sm:w-auto text-sm" onClick={() => setShowAdd(true)}>+ Add task</button>
             <div className="flex items-center gap-2">
-              <img src={mockUser.avatar} alt="avatar" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-indigo-200" />
-              <span className="font-semibold text-gray-700 text-sm sm:text-base">{mockUser.name}</span>
+              <img src={userAvatar} alt="avatar" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-indigo-200" />
+              <span className="font-semibold text-gray-700 text-sm sm:text-base">{userName}</span>
             </div>
           </div>
         </header>
