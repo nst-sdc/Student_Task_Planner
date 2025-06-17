@@ -4,10 +4,10 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
 import { useAuthStore } from '../../store/authStore';
 
-export default function SignupPage() {
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
-  const [submitted, setSubmitted] = useState(false);
+export default function LoginPage() {
+  const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState(null);
+  const [loggedIn, setLoggedIn] = useState(false);
   const setUser = useAuthStore((state) => state.setUser);
   const setSession = useAuthStore((state) => state.setSession);
   const user = useAuthStore((state) => state.user);
@@ -26,45 +26,41 @@ export default function SignupPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError(null);
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: form.email,
       password: form.password,
-      options: {
-        data: {
-          full_name: form.name,
-        },
-      },
     });
-    console.log('Supabase signUp response:', { data, error });
     if (error) {
       setError(error.message);
     } else {
       setUser(data.user);
       setSession(data.session);
       // Upsert user profile in the users table
-      const success = await useAuthStore.getState().upsertUserProfile(data.user.id, form.name);
+      const fullName = data.user.user_metadata?.full_name || '';
+      const success = await useAuthStore.getState().upsertUserProfile(data.user.id, fullName);
       if (!success) {
         setError('Failed to save user profile.');
-        return; // Stop further execution if upsert fails
       }
-      setSubmitted(true);
-      router.push('/');
+      setLoggedIn(true);
+      // Wait for profile upsert before redirecting
+      if (success) {
+        router.push('/');
+      }
     }
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-2">
       <div className="bg-white p-4 sm:p-8 rounded-xl shadow-md w-full max-w-md">
-        <h1 className="text-xl sm:text-2xl font-bold mb-6 text-center">Sign Up</h1>
-        {submitted ? (
-          <div className="text-green-600 text-center">Signup successful! Please check your email to confirm your account.</div>
+        <h1 className="text-xl sm:text-2xl font-bold mb-6 text-center">Log In</h1>
+        {loggedIn ? (
+          <div className="text-green-600 text-center">Login successful! Redirecting...</div>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <input name="name" value={form.name} onChange={handleChange} required placeholder="Name" className="border rounded px-3 py-2" />
             <input name="email" value={form.email} onChange={handleChange} required type="email" placeholder="Email" className="border rounded px-3 py-2" />
             <input name="password" value={form.password} onChange={handleChange} required type="password" placeholder="Password" className="border rounded px-3 py-2" />
             {error && <div className="text-red-600 text-center">{error}</div>}
-            <button type="submit" className="bg-primary-600 text-white py-2 rounded font-semibold hover:bg-primary-700">Sign Up</button>
+            <button type="submit" className="bg-primary-600 text-white py-2 rounded font-semibold hover:bg-primary-700">Log In</button>
           </form>
         )}
       </div>

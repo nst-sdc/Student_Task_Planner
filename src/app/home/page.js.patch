@@ -1,0 +1,176 @@
+import { useState } from 'react';
+import useTaskStore from '@/store/taskStore';
+import TaskList from '@/components/TaskList';
+import TaskFilters from '@/components/TaskFilters';
+import AddTaskModal from '@/components/AddTaskModal';
+import ProgressBar from '@/components/ProgressBar';
+import CalendarBar from '@/components/CalendarBar';
+import { format, startOfWeek, addDays, isToday } from 'date-fns';
+
+const mockUser = {
+  name: 'user',
+  avatar: 'https://ui-avatars.com/api/?name=U&background=4f46e5&color=fff',
+};
+=======
+'use client';
+import { useState } from 'react';
+import useTaskStore from '@/store/taskStore';
+import TaskList from '@/components/TaskList';
+import TaskFilters from '@/components/TaskFilters';
+import AddTaskModal from '@/components/AddTaskModal';
+import ProgressBar from '@/components/ProgressBar';
+import CalendarBar from '@/components/CalendarBar';
+import { format, startOfWeek, addDays, isToday } from 'date-fns';
+import { useAuthStore } from '@/store/authStore';
+
+<<<<<<< SEARCH
+const mockUser = {
+  name: 'user',
+  avatar: 'https://ui-avatars.com/api/?name=U&background=4f46e5&color=fff',
+};
+=======
+>>>>>>> REPLACE
+
+<<<<<<< SEARCH
+export default function Home() {
+  const { tasks, addTask, updateTask, removeTask, toggleComplete } = useTaskStore();
+  const [filter, setFilter] = useState('All');
+  const [showAdd, setShowAdd] = useState(false);
+  const filteredTasks = filterTasks(tasks, filter);
+  const completedCount = filteredTasks.filter((t) => t.completed).length;
+
+  // Mark overdue tasks (for demo, mark if date < today)
+  tasks.forEach((task) => {
+    if (task.date && !task.completed) {
+      const due = new Date(task.date);
+      const now = new Date();
+      const ist = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
+      task.overdue = due < new Date(format(ist, 'yyyy-MM-dd'));
+    } else {
+      task.overdue = false;
+    }
+  });
+
+  return (
+    <div className="bg-gray-100 min-h-screen flex w-full overflow-x-hidden">
+      <main className="flex-1 flex flex-col min-h-screen w-full min-w-0">
+        {/* Header */}
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 px-2 sm:px-4 md:px-8 py-4 sm:py-6 border-b bg-white w-full min-w-0">
+          <div className="w-full min-w-0">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-1">Welcome back, {mockUser.name}</h1>
+            <div className="text-gray-500 text-sm">Here's what's on your plate today.</div>
+          </div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full sm:w-auto min-w-0">
+            <button className="bg-indigo-600 text-white px-3 py-2 rounded-lg font-semibold shadow hover:bg-indigo-700 w-full sm:w-auto text-sm" onClick={() => setShowAdd(true)}>+ Add task</button>
+            <div className="flex items-center gap-2">
+              <img src={mockUser.avatar} alt="avatar" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-indigo-200" />
+              <span className="font-semibold text-gray-700 text-sm sm:text-base">{mockUser.name}</span>
+            </div>
+          </div>
+        </header>
+        {/* Task Filters */}
+        <div className="flex flex-col sm:flex-row gap-2 px-2 sm:px-4 md:px-8 py-3 sm:py-4 bg-white border-b w-full min-w-0">
+          <TaskFilters current={filter} onChange={setFilter} verticalOnMobile />
+        </div>
+        {/* Progress Bar */}
+        <div className="px-2 sm:px-4 md:px-8 pt-3 sm:pt-4 w-full min-w-0">
+          <ProgressBar completed={completedCount} total={filteredTasks.length} />
+        </div>
+        {/* Task List */}
+        <section className="flex-1 px-1 sm:px-2 md:px-8 py-4 sm:py-6 bg-gray-50 w-full min-w-0">
+          <TaskList
+            tasks={filteredTasks}
+            onEdit={() => {}}
+            onDelete={removeTask}
+            onToggle={toggleComplete}
+          />
+        </section>
+        {/* Calendar Bar */}
+        <footer className="bg-white border-t px-1 sm:px-4 md:px-8 py-3 sm:py-4 w-full min-w-0">
+          <CalendarBar days={getISTWeek()} rangeLabel={getISTWeekRangeLabel()} />
+        </footer>
+        <AddTaskModal
+          open={showAdd}
+          onClose={() => setShowAdd(false)}
+          onAdd={(task) => {
+            addTask({ ...task, completed: false });
+          }}
+        />
+      </main>
+    </div>
+  );
+}
+=======
+export default function Home() {
+  const { tasks, addTask, updateTask, removeTask, toggleComplete } = useTaskStore();
+  const [filter, setFilter] = useState('All');
+  const [showAdd, setShowAdd] = useState(false);
+  const filteredTasks = filterTasks(tasks, filter);
+  const completedCount = filteredTasks.filter((t) => t.completed).length;
+
+  const user = useAuthStore((state) => state.user);
+
+  // Mark overdue tasks (for demo, mark if date < today)
+  tasks.forEach((task) => {
+    if (task.date && !task.completed) {
+      const due = new Date(task.date);
+      const now = new Date();
+      const ist = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
+      task.overdue = due < new Date(format(ist, 'yyyy-MM-dd'));
+    } else {
+      task.overdue = false;
+    }
+  });
+
+  const userName = user?.profile?.full_name || 'User';
+  const userAvatar = user?.profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=4f46e5&color=fff`;
+
+  return (
+    <div className="bg-gray-100 min-h-screen flex w-full overflow-x-hidden">
+      <main className="flex-1 flex flex-col min-h-screen w-full min-w-0">
+        {/* Header */}
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 px-2 sm:px-4 md:px-8 py-4 sm:py-6 border-b bg-white w-full min-w-0">
+          <div className="w-full min-w-0">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-1">Welcome back, {userName}</h1>
+            <div className="text-gray-500 text-sm">Here's what's on your plate today.</div>
+          </div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full sm:w-auto min-w-0">
+            <button className="bg-indigo-600 text-white px-3 py-2 rounded-lg font-semibold shadow hover:bg-indigo-700 w-full sm:w-auto text-sm" onClick={() => setShowAdd(true)}>+ Add task</button>
+            <div className="flex items-center gap-2">
+              <img src={userAvatar} alt="avatar" className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-indigo-200" />
+              <span className="font-semibold text-gray-700 text-sm sm:text-base">{userName}</span>
+            </div>
+          </div>
+        </header>
+        {/* Task Filters */}
+        <div className="flex flex-col sm:flex-row gap-2 px-2 sm:px-4 md:px-8 py-3 sm:py-4 bg-white border-b w-full min-w-0">
+          <TaskFilters current={filter} onChange={setFilter} verticalOnMobile />
+        </div>
+        {/* Progress Bar */}
+        <div className="px-2 sm:px-4 md:px-8 pt-3 sm:pt-4 w-full min-w-0">
+          <ProgressBar completed={completedCount} total={filteredTasks.length} />
+        </div>
+        {/* Task List */}
+        <section className="flex-1 px-1 sm:px-2 md:px-8 py-4 sm:py-6 bg-gray-50 w-full min-w-0">
+          <TaskList
+            tasks={filteredTasks}
+            onEdit={() => {}}
+            onDelete={removeTask}
+            onToggle={toggleComplete}
+          />
+        </section>
+        {/* Calendar Bar */}
+        <footer className="bg-white border-t px-1 sm:px-4 md:px-8 py-3 sm:py-4 w-full min-w-0">
+          <CalendarBar days={getISTWeek()} rangeLabel={getISTWeekRangeLabel()} />
+        </footer>
+        <AddTaskModal
+          open={showAdd}
+          onClose={() => setShowAdd(false)}
+          onAdd={(task) => {
+            addTask({ ...task, completed: false });
+          }}
+        />
+      </main>
+    </div>
+  );
+}

@@ -17,9 +17,9 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Hamburger Button - always visible */}
+      {/* Fixed hamburger button visible only on mobile */}
       <button
-        className="fixed top-4 left-4 z-50 bg-white p-2 rounded shadow"
+        className="fixed top-4 left-4 z-50 bg-white p-2 rounded shadow md:hidden"
         onClick={() => setOpen(true)}
         aria-label="Open sidebar"
       >
@@ -38,19 +38,17 @@ export default function Sidebar() {
       >
         <div>
           <div className="flex items-center gap-2 px-6 py-6">
+            {/* Moved hamburger button inside sidebar next to website name */}
+            <button
+              className="mr-2 p-1 rounded hover:bg-gray-200"
+              onClick={() => setOpen(false)}
+              aria-label="Close sidebar"
+            >
+              <XMarkIcon className="w-6 h-6 text-gray-500" />
+            </button>
             <span className="text-indigo-700 text-2xl font-bold">
               <a href="/" className="no-underline hover:underline">TaskPlanner</a>
             </span>
-            {/* Close button (always visible when sidebar is open) */}
-            {open && (
-              <button
-                className="ml-auto"
-                onClick={() => setOpen(false)}
-                aria-label="Close sidebar"
-              >
-                <XMarkIcon className="w-6 h-6 text-gray-500" />
-              </button>
-            )}
           </div>
           <nav className="flex flex-col gap-1 px-2">
             {navItems.map((item) => {
